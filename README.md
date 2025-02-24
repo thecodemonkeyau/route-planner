@@ -1,6 +1,13 @@
 # Route Planning Project
 
-This repo contains the starter code for the Route Planning project.
+This repo contains projct code for Route Planning project for [Blake Swadling](mailto:blake.swadling@seeingmachines.com), which is build upon the starter code for the Route Planning project from Udacity.
+
+Project Repo URI
+```
+https://github.com/thecodemonkeyau/route-planner
+```
+
+---
 
 <img src="map.png" width="600" height="450" />
 
