@@ -58,9 +58,9 @@ int main(int argc, const char **argv)
     auto start_x = 0.0f; auto start_y = 0.0f; auto end_x = 0.0f; auto end_y = 0.0f;
     std::cout << "Enter the start and end coordinates as start_x start_y end_x end_y: ";
     while(!(std::cin >> start_x >> start_y >> end_x >> end_y)){
-        std::cout << "Invalid input!" << std::endl << "Please enter the start and end coordinates as start_x start_y end_x end_y: ";
+        std::cout << "Invalid input!" << std::endl << "Please enter the start and end coordinates: <start_x> <start_y> <end_x> <end_y>: ";
         std::cin.clear();
-        std::cin.ignore(8, '\n');
+        std::cin.ignore(255, '\n');
     }
     std::cout << "Start: " << start_x << " " << start_y << std::endl;
     std::cout << "End: " << end_x << " " << end_y << std::endl;
