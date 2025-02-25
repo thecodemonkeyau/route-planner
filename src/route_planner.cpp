@@ -34,19 +34,17 @@ float RoutePlanner::CalculateHValue(RouteModel::Node const *node) {
 // - For each node in current_node.neighbors, add the neighbor to open_list and set the node's visited attribute to true.
 
 void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
-    // check if current node is null
-    if (current_node == nullptr) {
-        std::cout << "Current node is null" << std::endl;
-        return;
-    }
-
-    current_node->FindNeighbors(); // init neighbour list
-    for (auto n : current_node->neighbors) {
-        n->parent = current_node;
-        n->h_value = CalculateHValue(n);
-        n->g_value = current_node->g_value + current_node->distance(*n);
-        open_list.push_back(n);
-        n->visited = true;
+    if (current_node != nullptr) {
+        current_node->FindNeighbors(); // init neighbour list
+        for (auto n : current_node->neighbors) {
+            n->parent = current_node;
+            n->h_value = CalculateHValue(n);
+            n->g_value = current_node->g_value + current_node->distance(*n);
+            open_list.push_back(n);
+            n->visited = true;
+        }
+    } else {        
+        std::cerr << "Current node is null" << std::endl;
     }
 }
 
@@ -59,17 +57,17 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 // - Return the pointer.
 
 RouteModel::Node *RoutePlanner::NextNode() {
-    if(open_list.size() == 0) { // sanity check
-        std::cout << "No open nodes found: open list is empty" << std::endl;
-        return nullptr;
+    if(open_list.size() != 0) {
+        // lambda sort routine
+        std::sort(open_list.begin(), open_list.end(), [](RouteModel::Node *start, RouteModel::Node *end) {
+            return (start->g_value + start->h_value) > (end->g_value + end->h_value);
+        });
+        RouteModel::Node *n = open_list.back();
+        open_list.pop_back();
+        return n;
     }
-    // lambda sort routine
-    std::sort(open_list.begin(), open_list.end(), [](RouteModel::Node *start, RouteModel::Node *end) {
-        return (start->g_value + start->h_value) > (end->g_value + end->h_value);
-    });
-    RouteModel::Node *n = open_list.back();
-    open_list.pop_back();
-    return n;
+    std::cerr << "No open nodes found: open list is empty" << std::endl;
+    return nullptr;
 
 }
 
@@ -86,23 +84,21 @@ std::vector<RouteModel::Node> RoutePlanner::ConstructFinalPath(RouteModel::Node 
     distance = 0.0f;
     std::vector<RouteModel::Node> path_found;
 
-    // guard against current node being null
-    if (current_node == nullptr) {
-        std::cout << "No path found: current node is null" << std::endl;
-        return path_found;
+    if (current_node != nullptr) {
+        // DONE: Implement your solution here.
+        while (current_node != start_node) {
+        distance += current_node->distance(*current_node->parent);
+        path_found.push_back(*current_node);
+        current_node = current_node->parent;
+        }
+        path_found.push_back(*current_node); // don't forget to save the start node
+        std::reverse(path_found.begin(), path_found.end()); // the path need to be reversed
+        distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
+    } else {
+        std::cerr << "Current node is null" << std::endl;
     }
-
-    // DONE: Implement your solution here.
-     while (current_node != start_node) {
-       distance += current_node->distance(*current_node->parent);
-       path_found.push_back(*current_node);
-       current_node = current_node->parent;
-    }
-    path_found.push_back(*current_node); // don't forget to save the start node
-    std::reverse(path_found.begin(), path_found.end()); // the path need to be reversed
-    distance *= m_Model.MetricScale(); // Multiply the distance by the scale of the map to get meters.
     // std::cout << "final path created; distance = " << distance << "m" << std::endl;
-    return path_found;
+    return path_found; // return empty path
 
 }
 
@@ -119,19 +115,19 @@ void RoutePlanner::AStarSearch() {
 
     // DONE: Implement your solution here.
     // guard against null start node or end node
-    if (start_node == nullptr || end_node == nullptr) {
-        std::cout << "No path found: null start or end node" << std::endl;
-        return;
-    }
-    start_node->visited = true;
-    open_list.push_back(start_node); //initialise open list
-    current_node = start_node;
+    if (start_node != nullptr && end_node != nullptr) {
+        start_node->visited = true;
+        open_list.push_back(start_node); //initialise open list
+        current_node = start_node;
 
-    while(current_node != end_node) {
-        AddNeighbors(current_node);
-        current_node = NextNode();
-    }
+        while(current_node != end_node) {
+            AddNeighbors(current_node);
+            current_node = NextNode();
+        }
 
-    m_Model.path = ConstructFinalPath(current_node);
+        m_Model.path = ConstructFinalPath(current_node);
+    } else {
+        std::cerr << "Start or end node is null" << std::endl;
+    }
 
 }
