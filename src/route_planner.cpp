@@ -58,7 +58,8 @@ void RoutePlanner::AddNeighbors(RouteModel::Node *current_node) {
 
 RouteModel::Node *RoutePlanner::NextNode() {
     if(open_list.size() != 0) {
-        // lambda sort routine
+
+        // lambda sort routine - did have const comparitor but this is cleaner
         std::sort(open_list.begin(), open_list.end(), [](RouteModel::Node *start, RouteModel::Node *end) {
             return (start->g_value + start->h_value) > (end->g_value + end->h_value);
         });
